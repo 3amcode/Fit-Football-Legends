@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Fit Football Legends – Professional football analytics dashboard with live standings, match results, AI predictions, and club/player search.">
+    <title>Fit Football Legends | Pro Analytics</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <!-- ===================== TICKER ===================== -->
+    <div class="ticker-bar">
+        <span class="ticker-label"><i class="fa-solid fa-bolt-lightning"></i> LIVE</span>
+        <div class="ticker-track">
+            <div class="ticker-content">
+                <span>⚽ Man City 2 – 1 Arsenal &nbsp;&nbsp;|&nbsp;&nbsp; ⚽ Liverpool 3 – 0 Wolves
+                    &nbsp;&nbsp;|&nbsp;&nbsp; ⚽ Chelsea 1 – 1 Tottenham &nbsp;&nbsp;|&nbsp;&nbsp; ⚽ Newcastle 2 – 2 Man
+                    Utd &nbsp;&nbsp;|&nbsp;&nbsp; ⚽ Aston Villa 1 – 0 Everton &nbsp;&nbsp;|&nbsp;&nbsp; ⚽ Brighton 0 – 2
+                    Fulham &nbsp;&nbsp;|&nbsp;&nbsp; ⚽ West Ham 3 – 1 Brentford</span>
+                <span>⚽ Man City 2 – 1 Arsenal &nbsp;&nbsp;|&nbsp;&nbsp; ⚽ Liverpool 3 – 0 Wolves
+                    &nbsp;&nbsp;|&nbsp;&nbsp; ⚽ Chelsea 1 – 1 Tottenham &nbsp;&nbsp;|&nbsp;&nbsp; ⚽ Newcastle 2 – 2 Man
+                    Utd &nbsp;&nbsp;|&nbsp;&nbsp; ⚽ Aston Villa 1 – 0 Everton &nbsp;&nbsp;|&nbsp;&nbsp; ⚽ Brighton 0 – 2
+                    Fulham &nbsp;&nbsp;|&nbsp;&nbsp; ⚽ West Ham 3 – 1 Brentford</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== NAVBAR ===================== -->
+    <nav class="navbar" id="mainNav">
+        <a href="#" class="nav-logo">
+            <span class="logo-ball">⚽</span>
+            <span class="logo-text">FFL <span class="logo-pro">PRO</span></span>
+        </a>
+
+        <ul class="nav-links">
+            <li><a href="#live" class="nav-link" data-section="live">
+                    <i class="fa-solid fa-signal-stream"></i> Match Centre
+                </a></li>
+            <li><a href="#standings" class="nav-link" data-section="standings">
+                    <i class="fa-solid fa-ranking-star"></i> Standings
+                </a></li>
+            <li><a href="#search-section" class="nav-link" data-section="search-section">
+                    <i class="fa-solid fa-magnifying-glass"></i> Search
+                </a></li>
+            <li><a href="#favorites" class="nav-link" data-section="favorites">
+                    <i class="fa-solid fa-heart"></i> Favorites
+                </a></li>
+            <li><a href="#prediction" class="nav-link nav-link-cta" data-section="prediction">
+                    <i class="fa-solid fa-brain"></i> AI Predictor
+                </a></li>
+        </ul>
+
+        <button class="nav-hamburger" id="navHamburger" aria-label="Toggle menu">
+            <span></span><span></span><span></span>
+        </button>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <ul>
+            <li><a href="#live" onclick="closeMobileMenu()"><i class="fa-solid fa-signal-stream"></i> Match Centre</a>
+            </li>
+            <li><a href="#standings" onclick="closeMobileMenu()"><i class="fa-solid fa-ranking-star"></i> Standings</a>
+            </li>
+            <li><a href="#search-section" onclick="closeMobileMenu()"><i class="fa-solid fa-magnifying-glass"></i>
+                    Search</a></li>
+            <li><a href="#favorites" onclick="closeMobileMenu()"><i class="fa-solid fa-heart"></i> Favorites</a></li>
+            <li><a href="#prediction" onclick="closeMobileMenu()"><i class="fa-solid fa-brain"></i> AI Predictor</a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- ===================== HERO ===================== -->
+    <header class="hero" id="hero">
+        <!-- Animated pitch lines -->
+        <div class="hero-pitch">
+            <div class="pitch-line pitch-center-circle"></div>
+            <div class="pitch-line pitch-halfway"></div>
+            <div class="pitch-line pitch-penalty-left"></div>
+            <div class="pitch-line pitch-penalty-right"></div>
+        </div>
+        <div class="hero-overlay"></div>
+
+        <div class="hero-inner">
+            <div class="hero-content">
+                <div class="hero-eyebrow">
+                    <span class="live-dot"></span>
+                    <span>PREMIER LEAGUE 2024/25 SEASON</span>
+                </div>
+                <h1 class="hero-headline">
+                    Football<br><span class="headline-accent">Analytics</span><br>Dashboard
+                </h1>
+                <p class="hero-sub">Track live data, league tables, squad reports and leverage advanced AI to predict
+                    match outcomes — all in one platform.</p>
+                <div class="hero-actions">
+                    <a href="#standings" class="btn btn-hero-primary">
+                        <i class="fa-solid fa-ranking-star"></i> View Standings
+                    </a>
+                    <a href="#prediction" class="btn btn-hero-ghost">
+                        <i class="fa-solid fa-brain"></i> AI Predictor
+                    </a>
+                </div>
+            </div>
+
+            <!-- Quick stat pills -->
+            <div class="hero-stats">
+                <div class="hero-stat-pill">
+                    <span class="pill-num">20</span>
+                    <span class="pill-lbl">Clubs</span>
+                </div>
+                <div class="hero-stat-pill">
+                    <span class="pill-num">380</span>
+                    <span class="pill-lbl">Matches</span>
+                </div>
+                <div class="hero-stat-pill">
+                    <span class="pill-num">AI</span>
+                    <span class="pill-lbl">Powered</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===================== MATCH CENTRE ===================== -->
+    <section id="live" class="section">
+        <div class="section-header">
+            <div class="section-title-group">
+                <span class="section-tag">MATCH CENTRE</span>
+                <h2 class="section-title">Fixtures & Results</h2>
+            </div>
+            <div class="section-tabs" id="matchTabs">
+                <button class="tab-btn active" id="tabUpcoming" onclick="switchMatchTab('upcoming')">Upcoming</button>
+                <button class="tab-btn" id="tabRecent" onclick="switchMatchTab('recent')">Recent Results</button>
+            </div>
+        </div>
+
+        <div id="upcomingPanel" class="match-panel active">
+            <div id="upcomingMatches" class="matches-grid">
+                <div class="loading-state">
+                    <div class="loading-spinner-ring"></div>
+                    <p>Loading upcoming fixtures…</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="recentPanel" class="match-panel">
+            <div id="previousMatches" class="matches-grid">
+                <div class="loading-state">
+                    <div class="loading-spinner-ring"></div>
+                    <p>Loading recent results…</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== STANDINGS ===================== -->
+    <section id="standings" class="section section-dark">
+        <div class="section-header">
+            <div class="section-title-group">
+                <span class="section-tag"><i class="fa-solid fa-trophy"></i> LEAGUE TABLE</span>
+                <h2 class="section-title">Premier League Standings</h2>
+            </div>
+            <div class="standings-legend">
+                <span class="legend-dot ucl"></span> Champions League
+                <span class="legend-dot uel"></span> Europa League
+                <span class="legend-dot rel"></span> Relegation
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="standings-table" id="standingsTableWrap">
+                <thead>
+                    <tr>
+                        <th class="th-pos">#</th>
+                        <th class="th-club">Club</th>
+                        <th title="Played">P</th>
+                        <th title="Won">W</th>
+                        <th title="Draw">D</th>
+                        <th title="Lost">L</th>
+                        <th title="Goal Difference">GD</th>
+                        <th title="Points" class="th-pts">Pts</th>
+                        <th title="Form (last 5)">Form</th>
+                    </tr>
+                </thead>
+                <tbody id="standingsTable">
+                    <tr>
+                        <td colspan="9">
+                            <div class="loading-state">
+                                <div class="loading-spinner-ring"></div>
+                                <p>Loading standings…</p>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ===================== SEARCH ===================== -->
+    <section id="search-section" class="section">
+        <div class="section-header">
+            <div class="section-title-group">
+                <span class="section-tag"><i class="fa-solid fa-database"></i> DATABASE</span>
+                <h2 class="section-title">Explore Football Database</h2>
+            </div>
+        </div>
+
+        <div class="search-dual-grid">
+            <!-- Team Search -->
+            <div class="search-panel" id="teamSearchPanel">
+                <div class="search-panel-header">
+                    <div class="search-panel-icon team-icon">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <div>
+                        <h3>Club Lookup</h3>
+                        <p>Find any club's squad, stadium & info</p>
+                    </div>
+                </div>
+                <div class="search-input-row">
+                    <input type="text" id="teamInput" class="search-input" placeholder="e.g. Arsenal, Real Madrid…"
+                        onkeydown="if(event.key==='Enter') searchTeam()">
+                    <button class="btn-search-action" onclick="searchTeam()" id="teamSearchBtn">
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+                <div class="quick-chips">
+                    <button class="chip" onclick="quickSearch('team','Arsenal')">Arsenal</button>
+                    <button class="chip" onclick="quickSearch('team','Liverpool')">Liverpool</button>
+                    <button class="chip" onclick="quickSearch('team','Chelsea')">Chelsea</button>
+                    <button class="chip" onclick="quickSearch('team','Barcelona')">Barcelona</button>
+                </div>
+                <div id="teamResult" class="search-result-area"></div>
+            </div>
+
+            <!-- Player Search -->
+            <div class="search-panel" id="playerSearchPanel">
+                <div class="search-panel-header">
+                    <div class="search-panel-icon player-icon">
+                        <i class="fa-solid fa-user-ninja"></i>
+                    </div>
+                    <div>
+                        <h3>Player Lookup</h3>
+                        <p>Find player profile, stats & bio</p>
+                    </div>
+                </div>
+                <div class="search-input-row">
+                    <input type="text" id="playerInput" class="search-input" placeholder="e.g. Erling Haaland…"
+                        onkeydown="if(event.key==='Enter') searchPlayer()">
+                    <button class="btn-search-action" onclick="searchPlayer()" id="playerSearchBtn">
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+                <div class="quick-chips">
+                    <button class="chip" onclick="quickSearch('player','Lionel Messi')">Messi</button>
+                    <button class="chip" onclick="quickSearch('player','Cristiano Ronaldo')">Ronaldo</button>
+                    <button class="chip" onclick="quickSearch('player','Kylian Mbappe')">Mbappé</button>
+                    <button class="chip" onclick="quickSearch('player','Erling Haaland')">Haaland</button>
+                </div>
+                <div id="playerResult" class="search-result-area"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== FAVORITES ===================== -->
+    <section id="favorites" class="section section-dark">
+        <div class="section-header">
+            <div class="section-title-group">
+                <span class="section-tag"><i class="fa-solid fa-heart"></i> MY CLUBS</span>
+                <h2 class="section-title">Favorite Clubs</h2>
+            </div>
+        </div>
+        <div id="favoriteTeams" class="favorites-grid">
+            <div class="empty-state">
+                <div class="empty-icon"><i class="fa-regular fa-bookmark"></i></div>
+                <h4>No favorites yet</h4>
+                <p>Search for a club above and click <strong>"Favorite"</strong> to pin it here.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== AI PREDICTOR ===================== -->
+    <section id="prediction" class="section">
+        <div class="section-header">
+            <div class="section-title-group">
+                <span class="section-tag"><i class="fa-solid fa-robot"></i> AI ENGINE</span>
+                <h2 class="section-title">Match Predictor</h2>
+            </div>
+        </div>
+
+        <div class="predictor-wrapper">
+            <div class="predictor-form-card">
+                <div class="predictor-vs-layout">
+                    <div class="predictor-team-input">
+                        <label for="team1"><i class="fa-solid fa-house"></i> Home Team</label>
+                        <input type="text" id="team1" placeholder="e.g. Arsenal" class="predictor-input">
+                    </div>
+
+                    <div class="predictor-vs-badge">VS</div>
+
+                    <div class="predictor-team-input">
+                        <label for="team2"><i class="fa-solid fa-plane"></i> Away Team</label>
+                        <input type="text" id="team2" placeholder="e.g. Liverpool" class="predictor-input">
+                    </div>
+                </div>
+
+                <button class="btn-predict-action" onclick="predictMatch()" id="predictBtn">
+                    <i class="fa-solid fa-bolt-lightning"></i>
+                    Generate AI Analysis
+                </button>
+            </div>
+
+            <div id="predictionResult" class="prediction-result-card hidden"></div>
+        </div>
+    </section>
+
+    <!-- ===================== FOOTER ===================== -->
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-brand-col">
+                <div class="footer-logo">⚽ FFL PRO</div>
+                <p class="footer-tagline">A state-of-the-art sports analytics platform powered by TheSportsDB and custom
+                    heuristic AI prediction engines.</p>
+                <div class="footer-social-row">
+                    <a href="#" class="footer-social-btn" aria-label="Twitter"><i
+                            class="fa-brands fa-x-twitter"></i></a>
+                    <a href="#" class="footer-social-btn" aria-label="Instagram"><i
+                            class="fa-brands fa-instagram"></i></a>
+                    <a href="#" class="footer-social-btn" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-links-col">
+                <h5>Navigation</h5>
+                <ul>
+                    <li><a href="#live">Match Centre</a></li>
+                    <li><a href="#standings">Standings</a></li>
+                    <li><a href="#search-section">Search</a></li>
+                    <li><a href="#favorites">Favorites</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-links-col">
+                <h5>Platform</h5>
+                <ul>
+                    <li><a href="#prediction">AI Predictor</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Use</a></li>
+                    <li><a href="#">Data Sources</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom-bar">
+            <p>&copy; 2026 Fit Football Legends. All rights reserved.</p>
+            <p class="footer-stack">Built with Flask &bull; SQLite &bull; Vanilla JS</p>
+        </div>
+    </footer>
+
+    <!-- ===================== SCRIPTS ===================== -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script>
+        // ---- Hamburger menu ----
+        const hamburger = document.getElementById('navHamburger');
+        const mobileMenu = document.getElementById('mobileMenu');
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('open');
+            mobileMenu.classList.toggle('open');
+        });
+        function closeMobileMenu() {
+            hamburger.classList.remove('open');
+            mobileMenu.classList.remove('open');
+        }
+
+        // ---- Sticky nav scroll style ----
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('mainNav');
+            nav.classList.toggle('scrolled', window.scrollY > 60);
+        });
+
+        // ---- Active nav link highlight ----
+        const sections = document.querySelectorAll('section[id], header[id]');
+        const navLinks = document.querySelectorAll('.nav-link[data-section]');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    const active = document.querySelector(`.nav-link[data-section="${entry.target.id}"]`);
+                    if (active) active.classList.add('active');
+                }
+            });
+        }, { rootMargin: '-40% 0px -50% 0px' });
+        sections.forEach(s => observer.observe(s));
+
+        // ---- Match tab switcher ----
+        function switchMatchTab(tab) {
+            const upcoming = document.getElementById('upcomingPanel');
+            const recent = document.getElementById('recentPanel');
+            const tabU = document.getElementById('tabUpcoming');
+            const tabR = document.getElementById('tabRecent');
+            if (tab === 'upcoming') {
+                upcoming.classList.add('active');
+                recent.classList.remove('active');
+                tabU.classList.add('active');
+                tabR.classList.remove('active');
+            } else {
+                recent.classList.add('active');
+                upcoming.classList.remove('active');
+                tabR.classList.add('active');
+                tabU.classList.remove('active');
+            }
+        }
+
+        // ---- Quick chip search ----
+        function quickSearch(type, name) {
+            if (type === 'team') {
+                document.getElementById('teamInput').value = name;
+                searchTeam();
+            } else {
+                document.getElementById('playerInput').value = name;
+                searchPlayer();
+            }
+        }
+    </script>
+</body>
+
+</html>

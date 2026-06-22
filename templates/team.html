@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Team profile — squad roster, club info and stats on Fit Football Legends.">
+    <title>Team Profile | Fit Football Legends</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        /* ── Team page extras ─────────────────────────────── */
+        .team-hero {
+            position: relative;
+            min-height: 52vh;
+            display: flex;
+            align-items: flex-end;
+            overflow: hidden;
+            padding: 0 6% 50px;
+        }
+
+        .team-hero-bg {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+        }
+
+        /* Pitch pattern overlay */
+        .team-hero-bg::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                repeating-linear-gradient(0deg,
+                    transparent,
+                    transparent 60px,
+                    rgba(255, 255, 255, 0.02) 60px,
+                    rgba(255, 255, 255, 0.02) 61px),
+                repeating-linear-gradient(90deg,
+                    transparent,
+                    transparent 60px,
+                    rgba(255, 255, 255, 0.02) 60px,
+                    rgba(255, 255, 255, 0.02) 61px);
+        }
+
+        .team-hero-gradient {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg,
+                    #060c1c 0%,
+                    #0d1e3a 40%,
+                    #0a2240 100%);
+        }
+
+        .team-hero-accent {
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 55% 60% at 80% 20%, rgba(0, 230, 118, 0.18) 0%, transparent 65%),
+                radial-gradient(ellipse 40% 40% at 15% 80%, rgba(0, 212, 255, 0.12) 0%, transparent 60%);
+        }
+
+        /* Corner circles like a real pitch */
+        .pitch-corner {
+            position: absolute;
+            width: 140px;
+            height: 140px;
+            border: 2px solid rgba(255, 255, 255, 0.04);
+            border-radius: 50%;
+        }
+
+        .pitch-corner.tl {
+            top: -70px;
+            left: -70px;
+        }
+
+        .pitch-corner.tr {
+            top: -70px;
+            right: -70px;
+        }
+
+        .pitch-corner.bl {
+            bottom: -70px;
+            left: -70px;
+        }
+
+        .pitch-corner.br {
+            bottom: -70px;
+            right: -70px;
+        }
+
+        .team-hero-content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: flex-end;
+            gap: 40px;
+            width: 100%;
+        }
+
+        /* Big team badge display */
+        .team-hero-badge {
+            flex-shrink: 0;
+            width: 160px;
+            height: 160px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(0, 230, 118, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .team-hero-badge:hover {
+            transform: scale(1.04);
+        }
+
+        .team-hero-badge img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.5));
+        }
+
+        .team-hero-badge .badge-placeholder {
+            font-size: 5rem;
+            color: rgba(255, 255, 255, 0.15);
+        }
+
+        .team-hero-info {
+            flex: 1;
+        }
+
+        .team-hero-league {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 230, 118, 0.12);
+            border: 1px solid rgba(0, 230, 118, 0.3);
+            color: #00e676;
+            padding: 5px 14px;
+            border-radius: 50px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 14px;
+        }
+
+        .team-hero-name {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: clamp(2.8rem, 6vw, 5.5rem);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            line-height: 0.95;
+            color: #fff;
+            margin-bottom: 18px;
+        }
+
+        .team-hero-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .meta-chip {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .meta-chip i {
+            color: #00e676;
+            width: 14px;
+        }
+
+        .team-hero-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        /* Stats bar across hero bottom */
+        .team-stat-strip {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+            background: rgba(255, 255, 255, 0.06);
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            margin-top: 50px;
+        }
+
+        .stat-strip-item {
+            background: rgba(5, 8, 15, 0.7);
+            padding: 18px;
+            text-align: center;
+            transition: background 0.2s ease;
+        }
+
+        .stat-strip-item:hover {
+            background: rgba(0, 230, 118, 0.08);
+        }
+
+        .stat-strip-num {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 2rem;
+            font-weight: 900;
+            color: #00e676;
+            line-height: 1;
+            display: block;
+        }
+
+        .stat-strip-lbl {
+            font-size: 0.68rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.35);
+            margin-top: 4px;
+            display: block;
+        }
+
+        /* Club description card */
+        .club-bio-card {
+            background: linear-gradient(135deg, #0d1a2e 0%, #111e35 100%);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 16px;
+            padding: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .club-bio-card::before {
+            content: '"';
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            font-size: 8rem;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 900;
+            color: rgba(0, 230, 118, 0.06);
+            line-height: 1;
+        }
+
+        .club-bio-card h3 {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #00e676;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .club-bio-card p {
+            font-size: 0.93rem;
+            line-height: 1.85;
+            color: rgba(255, 255, 255, 0.55);
+        }
+
+        /* Squad section header with trophy icon */
+        .squad-section-bg {
+            background:
+                linear-gradient(180deg, #060b18 0%, #080e1e 100%);
+        }
+
+        /* Player card — rich version */
+        .player-card-pro {
+            background: linear-gradient(160deg, #0f1b2e 0%, #131e30 100%);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .player-card-pro:hover {
+            transform: translateY(-8px);
+            border-color: rgba(0, 230, 118, 0.35);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 230, 118, 0.08);
+        }
+
+        /* Coloured position bar on top */
+        .player-card-pro::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+        }
+
+        .player-card-pro.pos-gk::before {
+            background: linear-gradient(90deg, #ffc107, #ff8f00);
+        }
+
+        .player-card-pro.pos-def::before {
+            background: linear-gradient(90deg, #00e676, #00c853);
+        }
+
+        .player-card-pro.pos-mid::before {
+            background: linear-gradient(90deg, #00d4ff, #0090ff);
+        }
+
+        .player-card-pro.pos-fwd::before {
+            background: linear-gradient(90deg, #ff1744, #ff6d00);
+        }
+
+        .player-img-wrap {
+            position: relative;
+            height: 200px;
+            overflow: hidden;
+            background: linear-gradient(180deg, #0d1928 0%, #0a1220 100%);
+        }
+
+        .player-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: top center;
+            transition: transform 0.4s ease;
+        }
+
+        .player-card-pro:hover .player-img-wrap img {
+            transform: scale(1.07);
+        }
+
+        .player-img-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(160deg, #0d1928 0%, #0f2040 100%);
+        }
+
+        .player-img-placeholder i {
+            font-size: 4.5rem;
+            color: rgba(255, 255, 255, 0.08);
+        }
+
+        /* Jersey number badge */
+        .jersey-overlay {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 36px;
+            height: 36px;
+            background: #00e676;
+            color: #000;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1rem;
+            font-weight: 900;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Position tag on image */
+        .pos-tag {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 0.62rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            padding: 3px 8px;
+            border-radius: 4px;
+        }
+
+        .pos-tag.gk {
+            background: rgba(255, 193, 7, 0.85);
+            color: #000;
+        }
+
+        .pos-tag.def {
+            background: rgba(0, 230, 118, 0.85);
+            color: #000;
+        }
+
+        .pos-tag.mid {
+            background: rgba(0, 212, 255, 0.85);
+            color: #000;
+        }
+
+        .pos-tag.fwd {
+            background: rgba(255, 23, 68, 0.85);
+            color: #fff;
+        }
+
+        .player-card-body {
+            padding: 16px;
+            text-align: center;
+        }
+
+        .player-card-name {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            color: #f0f4fc;
+            margin-bottom: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .player-card-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #00e676;
+            transition: gap 0.2s ease, color 0.2s ease;
+        }
+
+        .player-card-link:hover {
+            gap: 10px;
+            color: #fff;
+        }
+
+        /* Favourite / toast */
+        #fav-toast {
+            position: fixed;
+            bottom: 32px;
+            right: 32px;
+            z-index: 9999;
+            background: #00e676;
+            color: #000;
+            padding: 14px 24px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            display: none;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .team-hero {
+                padding: 0 5% 40px;
+                min-height: auto;
+            }
+
+            .team-hero-content {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 20px;
+            }
+
+            .team-hero-badge {
+                width: 110px;
+                height: 110px;
+            }
+
+            .team-hero-name {
+                font-size: 2.5rem;
+            }
+
+            .team-stat-strip {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ============ TOAST ============ -->
+    <div id="fav-toast">⭐ Added to Favorites!</div>
+
+    <!-- ============ NAVBAR ============ -->
+    <nav class="navbar scrolled">
+        <a href="/" class="nav-logo">
+            <span class="logo-ball">⚽</span>
+            <span class="logo-text">FFL <span class="logo-pro">PRO</span></span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="/" class="nav-link"><i class="fa-solid fa-arrow-left"></i> Dashboard</a></li>
+            <li><a href="/#standings" class="nav-link"><i class="fa-solid fa-ranking-star"></i> Standings</a></li>
+            <li><a href="/#search-section" class="nav-link"><i class="fa-solid fa-magnifying-glass"></i> Search</a></li>
+        </ul>
+    </nav>
+
+    <!-- ============ TEAM HERO ============ -->
+    <div class="team-hero" id="teamHero">
+        <div class="team-hero-bg">
+            <div class="team-hero-gradient"></div>
+            <div class="team-hero-accent"></div>
+            <div class="pitch-corner tl"></div>
+            <div class="pitch-corner tr"></div>
+            <div class="pitch-corner bl"></div>
+            <div class="pitch-corner br"></div>
+        </div>
+        <div class="team-hero-content" id="teamHeroContent">
+            <div class="loading-state" style="color:rgba(255,255,255,0.4)">
+                <div class="loading-spinner-ring"></div>
+                <p>Loading club profile…</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stat strip -->
+    <div class="team-stat-strip" id="teamStatStrip" style="display:none">
+        <div class="stat-strip-item">
+            <span class="stat-strip-num" id="sYear">—</span>
+            <span class="stat-strip-lbl">Founded</span>
+        </div>
+        <div class="stat-strip-item">
+            <span class="stat-strip-num" id="sStadium" style="font-size:1.1rem;padding-top:4px">—</span>
+            <span class="stat-strip-lbl">Stadium</span>
+        </div>
+        <div class="stat-strip-item">
+            <span class="stat-strip-num" id="sCapacity">—</span>
+            <span class="stat-strip-lbl">Capacity</span>
+        </div>
+        <div class="stat-strip-item">
+            <span class="stat-strip-num" id="sCountry" style="font-size:1.1rem;padding-top:4px">—</span>
+            <span class="stat-strip-lbl">Country</span>
+        </div>
+    </div>
+
+    <!-- ============ CLUB BIO ============ -->
+    <section class="section" id="clubBioSection" style="display:none">
+        <div class="club-bio-card" id="clubBioCard">
+            <h3><i class="fa-solid fa-circle-info"></i> Club Overview</h3>
+            <p id="clubBioText">Loading…</p>
+        </div>
+    </section>
+
+    <!-- ============ SQUAD ============ -->
+    <section class="section squad-section-bg">
+        <div class="section-header">
+            <div class="section-title-group">
+                <span class="section-tag"><i class="fa-solid fa-users"></i> SQUAD ROSTER</span>
+                <h2 class="section-title">First Team Players</h2>
+            </div>
+            <div id="playerCount" style="font-size:0.85rem;color:rgba(255,255,255,0.3)"></div>
+        </div>
+        <div id="playersContainer" class="squad-grid">
+            <div class="loading-state" style="grid-column:1/-1">
+                <div class="loading-spinner-ring"></div>
+                <p>Loading squad…</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ FOOTER ============ -->
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-brand-col">
+                <div class="footer-logo">⚽ FFL PRO</div>
+                <p class="footer-tagline">State-of-the-art football analytics powered by TheSportsDB.</p>
+            </div>
+            <div class="footer-links-col">
+                <h5>Quick Links</h5>
+                <ul>
+                    <li><a href="/">Home Dashboard</a></li>
+                    <li><a href="/#standings">Standings</a></li>
+                    <li><a href="/#live">Match Centre</a></li>
+                    <li><a href="/#prediction">AI Predictor</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom-bar">
+            <p>&copy; 2026 Fit Football Legends. All rights reserved.</p>
+            <p class="footer-stack">Built with Flask &bull; SQLite &bull; Vanilla JS</p>
+        </div>
+    </footer>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const teamId = params.get("id");
+
+        /* ── Position helpers ─────────────────────────────────────────────── */
+        function getPosClass(pos) {
+            if (!pos) return '';
+            const p = pos.toLowerCase();
+            if (p.includes('goal')) return 'gk';
+            if (p.includes('defend') || p.includes('back')) return 'def';
+            if (p.includes('mid')) return 'mid';
+            if (p.includes('forward') || p.includes('attack') || p.includes('winger') || p.includes('striker')) return 'fwd';
+            return 'mid';
+        }
+
+        /* ── Load team details ────────────────────────────────────────────── */
+        async function loadTeam() {
+            const heroContent = document.getElementById('teamHeroContent');
+
+            if (!teamId) {
+                heroContent.innerHTML = `<div class="error-card">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <h3>No Team ID</h3>
+            <p>No team identifier was provided in the URL.</p>
+            <a href="/" class="btn btn-secondary" style="margin-top:16px">← Dashboard</a>
+        </div>`;
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/team-details/${teamId}`);
+                const data = await res.json();
+
+                if (!data.teams || !data.teams.length) {
+                    heroContent.innerHTML = `<div class="error-card">
+                <i class="fa-solid fa-face-frown"></i>
+                <h3>Team Not Found</h3>
+                <p>No data for team ID <strong>${teamId}</strong>.</p>
+            </div>`;
+                    return;
+                }
+
+                const t = data.teams[0];
+                document.title = `${t.strTeam} | FFL PRO`;
+
+                /* Badge */
+                const badgeHtml = t.strBadge
+                    ? `<img src="${t.strBadge}" alt="${t.strTeam}">`
+                    : `<i class="badge-placeholder fa-solid fa-shield-halved"></i>`;
+
+                heroContent.innerHTML = `
+            <div class="team-hero-badge">${badgeHtml}</div>
+            <div class="team-hero-info">
+                <div class="team-hero-league">
+                    <i class="fa-solid fa-trophy"></i> ${t.strLeague || 'Football Club'}
+                </div>
+                <h1 class="team-hero-name">${t.strTeam}</h1>
+                <div class="team-hero-meta">
+                    ${t.strCountry ? `<span class="meta-chip"><i class="fa-solid fa-globe"></i>${t.strCountry}</span>` : ''}
+                    ${t.strStadium ? `<span class="meta-chip"><i class="fa-solid fa-building"></i>${t.strStadium}</span>` : ''}
+                    ${t.intFormedYear ? `<span class="meta-chip"><i class="fa-solid fa-calendar"></i>Est. ${t.intFormedYear}</span>` : ''}
+                </div>
+                <div class="team-hero-actions">
+                    <button class="btn-hero-primary" style="cursor:pointer"
+                        onclick="addFavorite('${esc(t.strTeam)}','${esc(t.strBadge || '')}','${esc(t.strLeague || '')}')">
+                        <i class="fa-solid fa-heart"></i> Add to Favorites
+                    </button>
+                    ${t.strWebsite
+                        ? `<a href="https://${t.strWebsite}" target="_blank" rel="noopener" class="btn-hero-ghost">
+                               <i class="fa-solid fa-globe"></i> Official Website
+                           </a>`
+                        : ''}
+                </div>
+            </div>`;
+
+                /* Stat strip */
+                document.getElementById('sYear').textContent = t.intFormedYear || '—';
+                document.getElementById('sStadium').textContent = t.strStadium || '—';
+                document.getElementById('sCapacity').textContent = t.intStadiumCapacity
+                    ? parseInt(t.intStadiumCapacity).toLocaleString() : '—';
+                document.getElementById('sCountry').textContent = t.strCountry || '—';
+                document.getElementById('teamStatStrip').style.display = 'grid';
+
+                /* Bio */
+                if (t.strDescriptionEN) {
+                    document.getElementById('clubBioText').innerHTML =
+                        t.strDescriptionEN.replace(/\r\n/g, '<br>');
+                    document.getElementById('clubBioSection').style.display = 'block';
+                }
+
+            } catch (err) {
+                console.error(err);
+                document.getElementById('teamHeroContent').innerHTML = `<div class="error-card">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <h3>Error</h3><p>${err.message}</p>
+        </div>`;
+            }
+        }
+
+        /* ── Load squad ──────────────────────────────────────────────────── */
+        async function loadPlayers() {
+            if (!teamId) return;
+            const container = document.getElementById('playersContainer');
+
+            try {
+                const res = await fetch(`/api/team-players/${teamId}`);
+                const data = await res.json();
+
+                container.innerHTML = '';
+
+                if (!data.player || !data.player.length) {
+                    container.innerHTML = `<div class="no-data-alert" style="grid-column:1/-1;text-align:center">
+                <i class="fa-regular fa-bell-slash"></i>
+                <p>No roster data available for this club.</p>
+            </div>`;
+                    return;
+                }
+
+                document.getElementById('playerCount').textContent =
+                    `${data.player.length} players registered`;
+
+                data.player.forEach(p => {
+                    const posClass = getPosClass(p.strPosition);
+                    const posLabel = p.strPosition || 'Player';
+
+                    const imgHtml = p.strThumb
+                        ? `<img src="${p.strThumb}" alt="${p.strPlayer}" loading="lazy">`
+                        : `<div class="player-img-placeholder"><i class="fa-solid fa-user-ninja"></i></div>`;
+
+                    container.innerHTML += `
+                <div class="player-card-pro pos-${posClass}"
+                     onclick="window.location='/player?name=${encodeURIComponent(p.strPlayer)}'">
+                    <div class="player-img-wrap">
+                        ${imgHtml}
+                        <span class="pos-tag ${posClass}">${posLabel}</span>
+                        ${p.strNumber ? `<span class="jersey-overlay">${p.strNumber}</span>` : ''}
+                    </div>
+                    <div class="player-card-body">
+                        <div class="player-card-name">${p.strPlayer}</div>
+                        <a href="/player?name=${encodeURIComponent(p.strPlayer)}" class="player-card-link"
+                           onclick="event.stopPropagation()">
+                            View Profile <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>`;
+                });
+
+            } catch (err) {
+                console.error(err);
+                container.innerHTML = `<div class="no-data-alert text-danger" style="grid-column:1/-1;text-align:center">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <p>Failed to load squad: ${err.message}</p>
+        </div>`;
+            }
+        }
+
+        /* ── Add favourite ───────────────────────────────────────────────── */
+        async function addFavorite(name, logo, league) {
+            try {
+                const res = await fetch('/api/favorite', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ team_name: name, team_logo: logo, league_name: league })
+                });
+                const data = await res.json();
+                const toast = document.getElementById('fav-toast');
+                toast.textContent = data.status === 'success'
+                    ? `⭐ ${name} added to Favorites!`
+                    : `${name} is already in Favorites.`;
+                toast.style.display = 'block';
+                setTimeout(() => toast.style.display = 'none', 3000);
+            } catch (err) { alert(err.message); }
+        }
+
+        function esc(s) { return String(s || '').replace(/'/g, "\\'"); }
+
+        window.addEventListener('DOMContentLoaded', () => { loadTeam(); loadPlayers(); });
+    </script>
+</body>
+
+</html>

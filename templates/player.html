@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Player profile — stats, biography and social links on Fit Football Legends.">
+    <title>Player Profile | Fit Football Legends</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        /* ── Player Hero ────────────────────────────────────── */
+        .player-hero {
+            position: relative;
+            min-height: 56vh;
+            display: flex;
+            align-items: flex-end;
+            overflow: hidden;
+            padding: 0 6% 0;
+        }
+
+        .player-hero-bg {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+        }
+
+        .player-hero-gradient {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, #06080f 0%, #0a1320 55%, #060d1c 100%);
+        }
+
+        /* Dynamic colour accent — changes per position */
+        .player-hero-accent {
+            position: absolute;
+            inset: 0;
+        }
+
+        /* Diagonal slash design */
+        .player-hero-slash {
+            position: absolute;
+            top: -10%;
+            right: -5%;
+            width: 55%;
+            height: 120%;
+            background: linear-gradient(160deg, rgba(0, 230, 118, 0.06) 0%, transparent 70%);
+            transform: skewX(-8deg);
+            pointer-events: none;
+        }
+
+        /* Subtle dots pattern */
+        .player-hero-dots {
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(circle, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+            background-size: 28px 28px;
+        }
+
+        /* Player photo area */
+        .player-hero-layout {
+            position: relative;
+            z-index: 2;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            align-items: flex-end;
+            width: 100%;
+            gap: 0;
+        }
+
+        /* Photo column */
+        .player-photo-col {
+            position: relative;
+            height: 420px;
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .player-photo-frame {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .player-photo-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: top center;
+            filter: drop-shadow(0 0 30px rgba(0, 0, 0, 0.7));
+        }
+
+        .player-photo-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            background: linear-gradient(180deg, rgba(0, 230, 118, 0.05) 0%, transparent 100%);
+        }
+
+        .player-photo-placeholder i {
+            font-size: 8rem;
+            color: rgba(0, 230, 118, 0.12);
+        }
+
+        /* Gradient fade at bottom of photo */
+        .player-photo-frame::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            background: linear-gradient(to top, #06080f 0%, transparent 100%);
+        }
+
+        /* Big jersey number watermark behind photo */
+        .jersey-watermark {
+            position: absolute;
+            bottom: -20px;
+            right: -30px;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 14rem;
+            font-weight: 900;
+            color: rgba(0, 230, 118, 0.04);
+            line-height: 1;
+            pointer-events: none;
+            z-index: 1;
+            user-select: none;
+        }
+
+        /* Info column */
+        .player-info-col {
+            padding: 40px 0 40px 40px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .player-position-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 16px;
+            border-radius: 50px;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 14px;
+        }
+
+        .pill-gk {
+            background: rgba(255, 193, 7, 0.15);
+            color: #ffc107;
+            border: 1px solid rgba(255, 193, 7, 0.35);
+        }
+
+        .pill-def {
+            background: rgba(0, 230, 118, 0.15);
+            color: #00e676;
+            border: 1px solid rgba(0, 230, 118, 0.35);
+        }
+
+        .pill-mid {
+            background: rgba(0, 212, 255, 0.15);
+            color: #00d4ff;
+            border: 1px solid rgba(0, 212, 255, 0.35);
+        }
+
+        .pill-fwd {
+            background: rgba(255, 23, 68, 0.15);
+            color: #ff1744;
+            border: 1px solid rgba(255, 23, 68, 0.35);
+        }
+
+        .pill-default {
+            background: rgba(255, 255, 255, 0.07);
+            color: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .player-hero-name {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: clamp(3rem, 6vw, 6rem);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -1.5px;
+            line-height: 0.92;
+            color: #fff;
+            margin-bottom: 24px;
+        }
+
+        /* Stat chips row */
+        .player-stat-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+
+        .stat-chip {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 10px 16px;
+        }
+
+        .stat-chip-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+
+        .stat-chip-icon.green {
+            background: rgba(0, 230, 118, 0.15);
+            color: #00e676;
+        }
+
+        .stat-chip-icon.cyan {
+            background: rgba(0, 212, 255, 0.15);
+            color: #00d4ff;
+        }
+
+        .stat-chip-icon.amber {
+            background: rgba(255, 193, 7, 0.15);
+            color: #ffc107;
+        }
+
+        .stat-chip-icon.red {
+            background: rgba(255, 23, 68, 0.15);
+            color: #ff1744;
+        }
+
+        .stat-chip-icon.purple {
+            background: rgba(124, 58, 237, 0.15);
+            color: #a78bfa;
+        }
+
+        .stat-chip-icon.white {
+            background: rgba(255, 255, 255, 0.07);
+            color: #94a3b8;
+        }
+
+        .stat-chip-text {
+            font-size: 0.82rem;
+        }
+
+        .stat-chip-text .lbl {
+            color: rgba(255, 255, 255, 0.35);
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            display: block;
+        }
+
+        .stat-chip-text .val {
+            color: #f0f4fc;
+            font-weight: 600;
+            font-size: 0.88rem;
+        }
+
+        /* Biography section */
+        .bio-section-card {
+            background: linear-gradient(135deg, #0b1625 0%, #0f1c30 100%);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 16px;
+            padding: 36px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bio-section-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, #00e676 0%, #00d4ff 100%);
+            border-radius: 4px 0 0 4px;
+        }
+
+        .bio-section-card h3 {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: #00e676;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .bio-section-card p {
+            font-size: 0.93rem;
+            line-height: 1.9;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Social links */
+        .social-cards-row {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .social-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 24px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #fff;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+        }
+
+        .social-card:hover {
+            transform: translateY(-3px);
+            opacity: 0.9;
+        }
+
+        .social-card i {
+            font-size: 1.2rem;
+        }
+
+        .s-facebook {
+            background: linear-gradient(135deg, #1877f2, #0d5dbf);
+        }
+
+        .s-twitter {
+            background: linear-gradient(135deg, #1da1f2, #0c7fc4);
+        }
+
+        .s-instagram {
+            background: linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .player-hero-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .player-photo-col {
+                height: 280px;
+            }
+
+            .player-info-col {
+                padding: 28px 0;
+            }
+
+            .player-hero {
+                min-height: auto;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .player-photo-col {
+                height: 220px;
+            }
+
+            .player-hero-name {
+                font-size: 2.5rem;
+            }
+
+            .stat-chip {
+                flex: 1;
+                min-width: 130px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ============ NAVBAR ============ -->
+    <nav class="navbar scrolled">
+        <a href="/" class="nav-logo">
+            <span class="logo-ball">⚽</span>
+            <span class="logo-text">FFL <span class="logo-pro">PRO</span></span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="/" class="nav-link"><i class="fa-solid fa-arrow-left"></i> Dashboard</a></li>
+            <li><a href="/#search-section" class="nav-link"><i class="fa-solid fa-magnifying-glass"></i> Search</a></li>
+        </ul>
+    </nav>
+
+    <!-- ============ PLAYER HERO ============ -->
+    <div class="player-hero" id="playerHero">
+        <div class="player-hero-bg">
+            <div class="player-hero-gradient"></div>
+            <div class="player-hero-accent" id="heroAccent"></div>
+            <div class="player-hero-slash"></div>
+            <div class="player-hero-dots"></div>
+        </div>
+
+        <div class="player-hero-layout" id="playerHeroLayout">
+            <div class="loading-state" style="grid-column:1/-1;color:rgba(255,255,255,0.35)">
+                <div class="loading-spinner-ring"></div>
+                <p>Loading player profile…</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ BIOGRAPHY ============ -->
+    <section class="section" id="bioSection" style="display:none">
+        <div class="container-narrow">
+            <div class="section-header" style="margin-bottom:24px">
+                <div class="section-title-group">
+                    <span class="section-tag"><i class="fa-solid fa-book-open"></i> BIOGRAPHY</span>
+                    <h2 class="section-title">Player Story</h2>
+                </div>
+            </div>
+            <div class="bio-section-card">
+                <h3><i class="fa-solid fa-quote-left"></i> About the Player</h3>
+                <p id="playerBio">Loading biography…</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ SOCIAL ============ -->
+    <section class="section section-dark" id="socialSection" style="display:none">
+        <div class="container-narrow">
+            <div class="section-header" style="margin-bottom:24px">
+                <div class="section-title-group">
+                    <span class="section-tag"><i class="fa-solid fa-share-nodes"></i> SOCIAL</span>
+                    <h2 class="section-title">Follow On Social</h2>
+                </div>
+            </div>
+            <div class="social-cards-row" id="socialLinks"></div>
+        </div>
+    </section>
+
+    <!-- ============ FOOTER ============ -->
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-brand-col">
+                <div class="footer-logo">⚽ FFL PRO</div>
+                <p class="footer-tagline">State-of-the-art football analytics powered by TheSportsDB.</p>
+            </div>
+            <div class="footer-links-col">
+                <h5>Quick Links</h5>
+                <ul>
+                    <li><a href="/">Home Dashboard</a></li>
+                    <li><a href="/#standings">Standings</a></li>
+                    <li><a href="/#live">Match Centre</a></li>
+                    <li><a href="/#prediction">AI Predictor</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom-bar">
+            <p>&copy; 2026 Fit Football Legends. All rights reserved.</p>
+            <p class="footer-stack">Built with Flask &bull; SQLite &bull; Vanilla JS</p>
+        </div>
+    </footer>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const playerName = params.get('name');
+
+        /* ── Position helper ─────────────────────────────────────────────── */
+        function getPosClass(pos) {
+            if (!pos) return 'default';
+            const p = pos.toLowerCase();
+            if (p.includes('goal')) return 'gk';
+            if (p.includes('defend') || p.includes('back')) return 'def';
+            if (p.includes('mid')) return 'mid';
+            if (p.includes('forward') || p.includes('attack') || p.includes('winger') || p.includes('striker')) return 'fwd';
+            return 'default';
+        }
+
+        /* ── Accent colour per position ──────────────────────────────────── */
+        function getAccentGradient(posClass) {
+            const map = {
+                gk: 'radial-gradient(ellipse 60% 60% at 30% 30%, rgba(255,193,7,0.14) 0%, transparent 65%)',
+                def: 'radial-gradient(ellipse 60% 60% at 30% 30%, rgba(0,230,118,0.12) 0%, transparent 65%)',
+                mid: 'radial-gradient(ellipse 60% 60% at 30% 30%, rgba(0,212,255,0.12) 0%, transparent 65%)',
+                fwd: 'radial-gradient(ellipse 60% 60% at 30% 30%, rgba(255,23,68,0.12) 0%, transparent 65%)',
+                default: 'radial-gradient(ellipse 60% 60% at 30% 30%, rgba(124,58,237,0.10) 0%, transparent 65%)',
+            };
+            return map[posClass] || map.default;
+        }
+
+        /* ── Load player ─────────────────────────────────────────────────── */
+        async function loadPlayer() {
+            const layout = document.getElementById('playerHeroLayout');
+
+            if (!playerName) {
+                layout.innerHTML = `<div class="error-card" style="grid-column:1/-1">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <h3>No Player Specified</h3>
+            <p>No player name was provided in the URL.</p>
+            <a href="/" class="btn btn-secondary" style="margin-top:16px">← Dashboard</a>
+        </div>`;
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/player/${encodeURIComponent(playerName)}`);
+                const data = await res.json();
+
+                if (!data.player || !data.player.length) {
+                    layout.innerHTML = `<div class="error-card" style="grid-column:1/-1">
+                <i class="fa-solid fa-face-frown"></i>
+                <h3>Player Not Found</h3>
+                <p>No data for: <strong>${playerName}</strong></p>
+            </div>`;
+                    return;
+                }
+
+                const p = data.player[0];
+                const posClass = getPosClass(p.strPosition);
+
+                document.title = `${p.strPlayer} | FFL PRO`;
+
+                /* Dynamic accent colour */
+                document.getElementById('heroAccent').style.background = getAccentGradient(posClass);
+
+                /* Photo */
+                const photoHtml = p.strThumb
+                    ? `<img src="${p.strThumb}" alt="${p.strPlayer}">`
+                    : `<div class="player-photo-placeholder">
+                   <i class="fa-solid fa-user-ninja"></i>
+               </div>`;
+
+                /* Hero layout */
+                layout.innerHTML = `
+            <div class="player-photo-col">
+                <div class="player-photo-frame">${photoHtml}</div>
+                ${p.strNumber ? `<div class="jersey-watermark">${p.strNumber}</div>` : ''}
+            </div>
+            <div class="player-info-col">
+                <div class="player-position-pill pill-${posClass}">
+                    <i class="fa-solid fa-shirt"></i> ${p.strPosition || 'Footballer'}
+                </div>
+                <h1 class="player-hero-name">${p.strPlayer}</h1>
+
+                <div class="player-stat-chips">
+                    ${p.strTeam ? `
+                    <div class="stat-chip">
+                        <div class="stat-chip-icon green"><i class="fa-solid fa-shield-halved"></i></div>
+                        <div class="stat-chip-text">
+                            <span class="lbl">Club</span>
+                            <span class="val">${p.strTeam}</span>
+                        </div>
+                    </div>` : ''}
+
+                    ${p.strNationality ? `
+                    <div class="stat-chip">
+                        <div class="stat-chip-icon cyan"><i class="fa-solid fa-flag"></i></div>
+                        <div class="stat-chip-text">
+                            <span class="lbl">Nationality</span>
+                            <span class="val">${p.strNationality}</span>
+                        </div>
+                    </div>` : ''}
+
+                    ${p.dateBorn ? `
+                    <div class="stat-chip">
+                        <div class="stat-chip-icon amber"><i class="fa-solid fa-cake-candles"></i></div>
+                        <div class="stat-chip-text">
+                            <span class="lbl">Born</span>
+                            <span class="val">${p.dateBorn}</span>
+                        </div>
+                    </div>` : ''}
+
+                    ${p.strBirthLocation ? `
+                    <div class="stat-chip">
+                        <div class="stat-chip-icon red"><i class="fa-solid fa-location-dot"></i></div>
+                        <div class="stat-chip-text">
+                            <span class="lbl">Birthplace</span>
+                            <span class="val">${p.strBirthLocation}</span>
+                        </div>
+                    </div>` : ''}
+
+                    ${p.strHeight ? `
+                    <div class="stat-chip">
+                        <div class="stat-chip-icon purple"><i class="fa-solid fa-arrows-up-down"></i></div>
+                        <div class="stat-chip-text">
+                            <span class="lbl">Height</span>
+                            <span class="val">${p.strHeight}</span>
+                        </div>
+                    </div>` : ''}
+
+                    ${p.strWeight ? `
+                    <div class="stat-chip">
+                        <div class="stat-chip-icon white"><i class="fa-solid fa-weight-hanging"></i></div>
+                        <div class="stat-chip-text">
+                            <span class="lbl">Weight</span>
+                            <span class="val">${p.strWeight}</span>
+                        </div>
+                    </div>` : ''}
+                </div>
+
+                ${p.strNumber ? `<div style="display:inline-flex;align-items:center;gap:10px;
+                    background:rgba(0,230,118,0.12);border:1px solid rgba(0,230,118,0.25);
+                    padding:8px 18px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;
+                    font-size:1.2rem;font-weight:900;color:#00e676">
+                    <i class="fa-solid fa-shirt"></i> #${p.strNumber}
+                </div>` : ''}
+            </div>`;
+
+                /* Biography */
+                if (p.strDescriptionEN) {
+                    document.getElementById('playerBio').innerHTML =
+                        p.strDescriptionEN.replace(/\r\n/g, '<br>');
+                    document.getElementById('bioSection').style.display = 'block';
+                }
+
+                /* Social links */
+                const nets = [
+                    { key: 'strFacebook', icon: 'fa-brands fa-facebook-f', label: 'Facebook', cls: 's-facebook' },
+                    { key: 'strTwitter', icon: 'fa-brands fa-x-twitter', label: 'Twitter / X', cls: 's-twitter' },
+                    { key: 'strInstagram', icon: 'fa-brands fa-instagram', label: 'Instagram', cls: 's-instagram' },
+                ];
+
+                const socialBox = document.getElementById('socialLinks');
+                let hasSocial = false;
+
+                nets.forEach(n => {
+                    const handle = p[n.key];
+                    if (handle && handle.trim()) {
+                        hasSocial = true;
+                        const url = handle.startsWith('http') ? handle : 'https://' + handle;
+                        socialBox.innerHTML += `
+                    <a href="${url}" target="_blank" rel="noopener" class="social-card ${n.cls}">
+                        <i class="${n.icon}"></i> ${n.label}
+                    </a>`;
+                    }
+                });
+
+                if (hasSocial) document.getElementById('socialSection').style.display = 'block';
+
+            } catch (err) {
+                console.error(err);
+                document.getElementById('playerHeroLayout').innerHTML = `
+            <div class="error-card" style="grid-column:1/-1">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <h3>Error</h3><p>${err.message}</p>
+            </div>`;
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', loadPlayer);
+    </script>
+</body>
+
+</html>
